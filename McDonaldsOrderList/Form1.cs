@@ -31,7 +31,7 @@ namespace McDonaldsOrderList
         private void Form1_Load(object sender, EventArgs e)
         {
 
-            StartServer();
+            JsonVeriDinle();
 
         }
 
@@ -194,7 +194,7 @@ namespace McDonaldsOrderList
         }
 
 
-        public void StartServer()
+        public void JsonVeriDinle()
         {
             IPAddress localAddr = IPAddress.Parse("192.168.88.1");
             int port = 1071;

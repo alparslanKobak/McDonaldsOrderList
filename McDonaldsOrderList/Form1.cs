@@ -31,7 +31,7 @@ namespace McDonaldsOrderList
         private void Form1_Load(object sender, EventArgs e)
         {
 
-            JsonVeriDinle();
+            JsonVeriDinle("192.168.184.214");
 
         }
 
@@ -194,47 +194,56 @@ namespace McDonaldsOrderList
         //}
 
 
-        public void JsonVeriDinle(string IpAddress= "192.168.88.1", int port = 1071)
+        public void JsonVeriDinle(string IpAddress= "192.168.88.1" , int port = 1071)
         {
+            // Dinleyici kişinin IP adresini alır. Yani Göndericinin Gönderdiği IP adresi ile aynı olmalıdır !!!!
             IPAddress localAddr = IPAddress.Parse(IpAddress);
           
-            // 
-            TcpListener server = new TcpListener(localAddr, port);
+            // Dinlenecek portu belirle
+            TcpListener server = new TcpListener(IPAddress.Any, port); // Dinleyici veri ile gönderici verinin portu aynı olmalıdır !!!!
             server.Start();
 
             Task.Run(() => // Asenkron iş parçacığında server dinlemeye başlar
             {
                 while (true)
                 {
-                    using (TcpClient client = server.AcceptTcpClient())
-                    using (NetworkStream stream = client.GetStream())
+                    try
                     {
-                        byte[] lengthBytes = new byte[4];
-                        stream.Read(lengthBytes, 0, 4);
-                        int length = BitConverter.ToInt32(lengthBytes, 0);
-
-                        byte[] jsonBytes = new byte[length];
-                        stream.Read(jsonBytes, 0, jsonBytes.Length);
-
-                        string jsonString = Encoding.UTF8.GetString(jsonBytes);
-
-                        List<Order> receivedOrders = JsonSerializer.Deserialize<List<Order>>(jsonString);
-
-                        // UI güncellemeleri UI thread'inde yapılmalı
-                        this.Invoke((MethodInvoker)delegate
+                        using (TcpClient client = server.AcceptTcpClient())
+                        using (NetworkStream stream = client.GetStream())
                         {
-                            _AllOrders.Clear();
-                            foreach (Order order in receivedOrders)
-                            {
-                                if (order.OrderStatus.ToLower() != "teslim")
-                                {
-                                    _AllOrders.Add(order);
-                                    UpdateOrders(); // UI güncellemesi
-                                }
-                            }
+                            byte[] lengthBytes = new byte[4];
+                            stream.Read(lengthBytes, 0, 4);
+                            int length = BitConverter.ToInt32(lengthBytes, 0);
 
-                            
-                        });
+                            byte[] jsonBytes = new byte[length];
+                            stream.Read(jsonBytes, 0, jsonBytes.Length);
+
+                            string jsonString = Encoding.UTF8.GetString(jsonBytes);
+
+                            List<Order> receivedOrders = JsonSerializer.Deserialize<List<Order>>(jsonString);
+
+                            // UI güncellemeleri UI thread'inde yapılmalı
+                            this.Invoke((MethodInvoker)delegate
+                            {
+                                _AllOrders.Clear();
+                                foreach (Order order in receivedOrders)
+                                {
+                                    if (order.OrderStatus.ToLower() != "teslim")
+                                    {
+                                        _AllOrders.Add(order);
+                                        UpdateOrders(); // UI güncellemesi
+                                    }
+                                }
+
+
+                            });
+                        }
+                    }
+                    catch (Exception e)
+                    {
+
+                        continue;
                     }
                 }
             });

@@ -169,35 +169,35 @@ namespace McDonaldsOrderList
             }
         }
 
-        public void InitializeMockOrders()
+        //public void InitializeMockOrders()
+        //{
+
+        //    // AllOrders listesini temizle
+        //    _AllOrders.Clear();
+
+        //    // 10 adet sipariş oluştur ve AllOrders listesine ekle
+        //    for (int i = 0; i < 20; i++)
+        //    {
+        //        Order order = new Order();
+        //        order.Id = i + 1;
+        //        order.OrderStatus = i % 5 == 0 ? "hazır" : "hazırlanıyor";
+        //        if (order.OrderStatus.ToLower() == "hazır")
+        //        {
+        //            Console.Beep();
+        //        }
+        //        if (order.OrderStatus.ToLower() != "teslim")
+        //        {
+        //            _AllOrders.Add(order);
+
+        //        }
+        //    }
+        //}
+
+
+        public void JsonVeriDinle(string IpAddress= "192.168.88.1", int port = 1071)
         {
-
-            // AllOrders listesini temizle
-            _AllOrders.Clear();
-
-            // 10 adet sipariş oluştur ve AllOrders listesine ekle
-            for (int i = 0; i < 20; i++)
-            {
-                Order order = new Order();
-                order.Id = i + 1;
-                order.OrderStatus = i % 5 == 0 ? "hazır" : "hazırlanıyor";
-                if (order.OrderStatus.ToLower() == "hazır")
-                {
-                    Console.Beep();
-                }
-                if (order.OrderStatus.ToLower() != "teslim")
-                {
-                    _AllOrders.Add(order);
-
-                }
-            }
-        }
-
-
-        public void JsonVeriDinle()
-        {
-            IPAddress localAddr = IPAddress.Parse("192.168.88.1");
-            int port = 1071;
+            IPAddress localAddr = IPAddress.Parse(IpAddress);
+          
             // 
             TcpListener server = new TcpListener(localAddr, port);
             server.Start();
